@@ -3,7 +3,7 @@ import pandas as pd
 from pathlib import Path
 
 from src.models.base_model import BaseModel
-from src.models.content_based.cb1_genome import CB1Genome
+from src.models.content_based.cb4_genome_tags import CB4GenomeTags
 from src.ui.tabs.tab_rate import render_tab_rate
 from src.ui.tabs.tab_recommendations import render_tab_recommendations
 from src.ui.tabs.tab_similar import render_tab_similar
@@ -29,12 +29,12 @@ st.set_page_config(
 def load_model() -> BaseModel:
     """
     Load the content-based recommendation model from artifacts.
-    Currently loads the CB1Genome model, which uses TMDB genome features.
+    Currently loads the CB4GenomeTags model, which uses TMDB genome features.
     Returns:
         BaseModel: The loaded recommendation model.
     """
     logger.info(f"Loading {MODEL_NAME} model from artifacts...")
-    return CB1Genome.load(Path(ARTIFACTS_DIR), MODEL_NAME)
+    return CB4GenomeTags.load(Path(ARTIFACTS_DIR), MODEL_NAME)
 
 
 @st.cache_resource

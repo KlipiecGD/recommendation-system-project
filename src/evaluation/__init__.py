@@ -13,7 +13,7 @@ from src.evaluation.cb_evaluator import (
     KS,
     RELEVANCE_THRESHOLD,
 )
-from evaluation.cb_report import (
+from src.evaluation.cb_report import (
     run_report,
     format_markdown_table,
 )

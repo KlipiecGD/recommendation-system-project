@@ -89,16 +89,6 @@ class Config:
         """
         return self._config.get("models", {})
 
-    @property
-    def model_config_cb1_genome(self) -> dict:
-        """
-        Get the configuration for the CB1Genome model.
-        Returns:
-            dict: The configuration for the CB1Genome model.
-        """
-        models_config = self.model_config
-        return models_config.get("cb1_genome", {})
-
     def get_specific_model_config(self, model_key: str) -> dict:
         """
         Get the configuration for any model by its config key.

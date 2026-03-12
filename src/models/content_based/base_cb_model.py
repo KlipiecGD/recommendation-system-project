@@ -120,6 +120,7 @@ class BaseCBModel(BaseModel):
             for i in range(end - start):
                 sims[i, start + i] = -np.inf
 
+            self.top_k = min(self.top_k, n_movies - 1)
             top_k_idx = np.argpartition(sims, -self.top_k, axis=1)[:, -self.top_k :]
             for i, idx in enumerate(top_k_idx):
                 sorted_idx = idx[np.argsort(sims[i, idx])[::-1]]
