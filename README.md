@@ -32,11 +32,13 @@ rec_sys_project/
 │       └── ml-25m/                     # MovieLens 25M source CSVs
 ├── documents/                          # Extended project documentation
 │   ├── artifacts.md                    # Description of saved model artifacts
-│   ├── description_content_based.md    # Content-based filtering methodology
+│   ├── description_content_based.md    # Content-based and collaborative filtering methodology
+│   ├── evaluation_results.md           # Summary of evaluation results across all models
 │   ├── evaluation.md                   # Evaluation methodology and metrics
 │   └── features.md                     # Feature engineering details
 ├── notebooks/                          # Exploratory Jupyter notebooks
-│   └── artifacts_overview.ipynb        # Overview and inspection of generated artifacts
+│   ├── artifacts_overview.ipynb        # Overview and inspection of generated artifacts
+│   └── results_comparison.ipynb        # Plots comparing evaluation results across models and metrics
 ├── reports/                            # Evaluation outputs
 │   └── evaluation_results.csv          # Aggregated CB evaluation metrics across all models
 ├── src/
@@ -213,15 +215,19 @@ python -m src.evaluation.cf_report          # Run evaluation loop, print metrics
 ```
 
 > ⚠️ Note: Evaluation may take a few hours to run, especially for the collaborative filtering algorithms.
+
+Evaluation results are summarised in [documents/evaluation_results.md](documents/evaluation_results.md) and the generated CSV files in `reports/` (`evaluation_results.csv` for content-based models and `cf_evaluation_results.csv` for collaborative filtering).
+
 ---
 
 ## 📓 Notebooks
 
-Notebook to take a look at generated artifacts is available in the [`notebooks/`](notebooks/) directory:
+
 
 | Notebook | Description |
 |---|---|
 | `artifacts_overview.ipynb` | Overview and inspection of generated artifacts |
+| `results_comparison.ipynb` | Plots comparing evaluation results across models and metrics |
 
 ---
 
@@ -234,6 +240,7 @@ Detailed documentation is available in the [`documents/`](documents/) folder:
 | [artifacts.md](documents/artifacts.md) | Description of model artifacts |
 | [description_content_based.md](documents/description_content_based.md) | Content-based filtering methodology |
 | [evaluation.md](documents/evaluation.md) | Evaluation methodology and metrics |
+| [evaluation_results.md](documents/evaluation_results.md) | Summary of evaluation results across all models |
 | [features.md](documents/features.md) | Feature engineering details |
 
 ---

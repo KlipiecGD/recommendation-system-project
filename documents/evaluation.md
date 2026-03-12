@@ -1,4 +1,6 @@
-# Evaluation Approach - Content-Based Models
+# Evaluation Approach 
+
+# Content Based Models
 
 ## Guiding Principle
 
@@ -164,14 +166,25 @@ where $\text{IDCG@K}$ is the ideal (best possible) DCG. NDCG rewards models that
 
 ---
 
-## Evaluation vs. Validation
+# Collaborative Filtering Models
 
-| Purpose | Split used | When |
-|---|---|---|
-| Model selection, weight tuning | **val** | During development |
-| Final reported numbers | **test** | Once, after model is finalised |
-| Production model fit | **train + val** | Before deployment |
+## Guiding Principle
 
-The test split is used **at most once per model** to avoid implicit overfitting to test distribution.
+Collaborative filtering models use only interaction data: **`userId`**, **`movieId`**, and **`rating`**. They do not use item content features (genres, tags, TMDB text, etc.).
 
----
+## Evaluation Logic
+
+The evaluation follows the **same temporal split and ranking protocol** as content-based models:
+- same train/val/test construction,
+- same user eligibility rules,
+- same relevance definition (`rating >= 4.0` for ranking evaluation),
+- same top-K metrics at **K in {5, 10, 20}**: **HR@K, P@K, R@K, NDCG@K**.
+
+In addition, collaborative filtering reports **RMSE** for rating prediction quality:
+
+$$
+	{RMSE} = \sqrt{\frac{1}{N}\sum_{i=1}^{N}(\hat{r}_i-r_i)^2}
+$$
+
+where $\hat{r}_i$ is the predicted rating and $r_i$ is the true rating. 
+
