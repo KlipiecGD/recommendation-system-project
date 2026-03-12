@@ -1,0 +1,185 @@
+# Data configuration
+data_config:
+  data_source_link: https://files.grouplens.org/datasets/movielens/ml-25m.zip
+  min_ratings_per_user_split: 5
+  min_movie_ratings: 200
+  min_user_ratings: 100
+  val_ratio: 0.1
+  test_ratio: 0.1
+  raw_dir: ./data/raw/ml-25m
+  processed_dir: ./data/processed/full
+  artifacts_dir: ./artifacts/full
+  eval_artifacts_dir: ./artifacts/eval
+  ratings_file: ratings.csv
+  movies_file: movies.csv
+  users_file: users.csv
+  links_file: links.csv
+  tags_file: tags.csv
+  genome_scores_file: genome-scores.csv
+  genome_tags_file: genome-tags.csv
+  encoding: 'utf-8'
+  has_genomes: true
+  has_links: true
+  has_tags: true
+  all_genres: [Action, Adventure, Animation, Children, Comedy, Crime, Documentary, Drama, Fantasy, Film-Noir, Horror, IMAX, Musical, Mystery, Romance, Sci-Fi, Thriller, War, Western]
+  cf_artifacts_dir: ./artifacts/cf
+  cf_reports_path: ./reports/cf_evaluation_results.csv
+
+# TMDB API configuration
+tmdb_api:
+  tmdb_base_url: https://api.themoviedb.org/3
+  tmdb_img_base_url: https://image.tmdb.org/t/p/
+  top_cast: 5
+  image_size: w500
+
+# Feature engineering configuration
+feature_builder:
+  random_seed: 42
+  numerical_features: ["runtime_min", "vote_average", "popularity"]
+
+  # User tags configuration: TF-IDF vectorization parameters for user-generated tags
+  user_tags:
+    n_components: 100
+    max_features: 5000
+    min_df: 2
+    max_df: 0.95
+    sublinear_tf: true
+
+  # Overview configuration: TF-IDF vectorization parameters for movie overviews
+  overview_tfidf:
+    n_components: 100
+    max_features: 5000
+    min_df: 2
+    max_df: 0.95
+    stop_words: english
+    sublinear_tf: true
+
+  # Overview configuration: SBERT embedding parameters for movie overviews
+  overview_sbert:
+    model_name: "all-MiniLM-L6-v2"
+    batch_size: 64
+
+  # TMDB structural features configuration: dimensionality reduction parameters for director and cast features
+  director:
+    n_components: 50
+
+  cast:
+    n_components: 50
+    top_n: 3
+
+# Content-based model configuration
+models:
+  strategies: ["weighted", "mean_centering"]  # Strategies for user profile aggregation
+  metrics: ["cosine", "euclidean"]  # Similarity metrics to use in content-based models
+  # Genome-based model configuration
+  cb1_genome:
+    model_name: "CB1_Genome"
+    top_k: 100
+    metric: cosine    # cosine | euclidean
+    batch_size: 512
+    profile_strategy: mean_centering   # weighted | mean_centering
+
+  # Genres and year-based model configuration
+  cb2_genres_year:
+    model_name: "CB2_GenresYear"
+    top_k: 100
+    metric: cosine
+    batch_size: 512
+    profile_strategy: mean_centering   # weighted | mean_centering
+
+  # Genome and genres-based model configuration with feature weighting
+  cb3_genome_genres:
+    model_name: "CB3_GenomeGenres"
+    top_k: 100
+    metric: cosine
+    batch_size: 512
+    profile_strategy: mean_centering   # weighted | mean_centering
+    weights:
+      genome: 1.0
+      genres: 0.5
+      year: 0.2
+
+  # Genome and tags-based model configuration with feature weighting
+  cb4_genome_tags:
+    model_name: "CB4_GenomeTags"
+    top_k: 100
+    metric: cosine
+    batch_size: 512
+    profile_strategy: mean_centering   # weighted | mean_centering
+    weights:
+      genome: 1.0
+      tags: 0.5
+
+  # Overview TF-IDF-based model configuration
+  cb5_overview_tfidf:
+    model_name: "CB5_OverviewTFIDF"
+    top_k: 100
+    metric: cosine
+    batch_size: 512
+    profile_strategy: mean_centering   # weighted | mean_centering
+
+  # Overview SBERT-based model configuration
+  cb6_overview_sbert:
+    model_name: "CB6_OverviewSBERT"
+    top_k: 100
+    metric: cosine
+    batch_size: 512
+    profile_strategy: mean_centering   # weighted | mean_centering
+
+  # TMDB structural features-based model configuration with feature weighting
+  cb7_tmdb_structural:
+    model_name: "CB7_TMDBStructural"
+    top_k: 100
+    metric: cosine
+    batch_size: 512
+    profile_strategy: mean_centering   # weighted | mean_centering
+    weights:
+      cast: 0.8
+      director: 1.0
+      numerical: 0.3
+
+  # Combined model configuration with all features and feature weighting (tf-idf for tags and overview)
+  cb8_full:
+    model_name: "CB8_Full"
+    top_k: 100
+    metric: cosine
+    batch_size: 512
+    profile_strategy: mean_centering   # weighted | mean_centering
+    weights:
+      genome: 1.0
+      genres: 0.5
+      year: 0.2
+      tags: 0.5
+      overview_tfidf: 1.0
+      cast: 0.5
+      director: 0.8
+      numerical: 0.3
+
+  # Combined model configuration with genome, overview and cast + director features and feature weighting (sbert for overview)
+  cb9_genome_tmdb:
+    model_name: "CB9_GenomeTMDB"
+    top_k: 100
+    metric: cosine
+    batch_size: 512
+    profile_strategy: mean_centering   # weighted | mean_centering
+    weights:
+      genome: 1.0
+      sbert: 1.0
+      cast: 0.5
+      director: 0.8
+
+# Evaluation configuration
+evaluation:
+  split: val # val | test
+  ks: [5, 10, 20]
+  relevance_threshold: 4.0 # Minimum rating to consider an item relevant for evaluation metrics
+  results_path: reports/evaluation_results.csv
+
+# UI configuration
+ui:
+  n_recommendations: 10
+  n_similar: 10
+  insights_threshold_rating: 4.0 # Minimum rating to consider a movie as "liked" for generating insights
+  artifact_path: artifacts/full/cb4 # Path to model used in the UI for generating recommendations and similar movies
+  dataset_path: data/processed/full 
+  model_name: "CB4_GenomeTags" # Model used in the UI for generating recommendations and similar movies
