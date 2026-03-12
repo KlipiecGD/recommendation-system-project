@@ -5,6 +5,7 @@ import pandas as pd
 
 from src.models.collaborative_filtering.cf_model import CFModel, ALGORITHM_REGISTRY
 from src.evaluation.cf_evaluator import evaluate_model, KS, RELEVANCE_THRESHOLD
+from src.evaluation.table_utils import render_markdown_table
 from src.logging_utils.logger import logger
 from src.config.config import config
 
@@ -16,53 +17,32 @@ CF_REPORTS_PATH = Path(
 
 def format_comparison_table(results: list[dict], ks: list[int] = KS) -> str:
     """
-    Format evaluation results as a readable markdown table.
+    Format evaluation results as a readable Markdown table.
     Columns are ordered: model | n_users | rmse | hr@K | p@K | r@K | ndcg@K
     for each K, grouped by K for easy scanning.
     Args:
         results (list[dict]): List of result dicts from evaluate_model().
         ks (list[int]): Cut-off values used during evaluation.
     Returns:
-        str: Multi-line markdown table string.
+        str: Multi-line Markdown table string.
     """
     if not results:
         return "No results to display."
-
+ 
     df = pd.DataFrame(results).set_index("model")
-
-    # Build ordered column list
+ 
     metric_cols = [f"{m}@{k}" for k in ks for m in ("hr", "p", "r", "ndcg")]
     ordered_cols = ["n_users", "rmse"] + [c for c in metric_cols if c in df.columns]
     df = df[ordered_cols]
-
-    # Format values
+ 
     display = df.copy().reset_index()
     for col in ordered_cols:
         if col == "n_users":
             display[col] = display[col].astype(int)
-        elif col == "rmse":
-            display[col] = display[col].map(lambda x: f"{x:.4f}")
         else:
             display[col] = display[col].map(lambda x: f"{x:.4f}")
-
-    headers = list(display.columns)
-    col_widths = [max(len(h), 10) for h in headers]
-
-    def _sep() -> str:
-        """Generate markdown separator row based on column widths."""
-        return "| " + " | ".join("-" * w for w in col_widths) + " |"
-
-    def _row(values: list) -> str:
-        """Format a single row of values as a markdown table row."""
-        cells = [str(v).ljust(w) for v, w in zip(values, col_widths)]
-        return "| " + " | ".join(cells) + " |"
-
-    lines = [
-        _row(headers),
-        _sep(),
-        *[_row(list(row)) for _, row in display.iterrows()],
-    ]
-    return "\n".join(lines)
+ 
+    return render_markdown_table(display, min_width=10)
 
 
 def print_summary(results: list[dict], ks: list[int] = KS) -> None:

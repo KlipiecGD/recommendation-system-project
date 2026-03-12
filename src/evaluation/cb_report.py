@@ -11,6 +11,7 @@ from src.evaluation.cb_evaluator import (
     evaluate_model,
 )
 from src.evaluation.metrics import aggregate_metrics
+from src.evaluation.table_utils import render_markdown_table
 from src.logging_utils.logger import logger
 from src.config.config import config
 
@@ -112,40 +113,16 @@ def format_markdown_table(df: pd.DataFrame, ks: list[int] = KS) -> str:
     """
     if df.empty:
         return "No results to display"
-
-    # Build ordered column list: n_users then metrics grouped by K
+ 
     metric_cols = [f"{m}@{k}" for k in ks for m in ("hr", "p", "r", "ndcg")]
     ordered_cols = ["n_users"] + [c for c in metric_cols if c in df.columns]
+ 
     display = df[ordered_cols].copy()
-
-    # Round metric columns
     for col in ordered_cols[1:]:
         display[col] = display[col].map(lambda x: f"{x:.4f}")
     display["n_users"] = display["n_users"].astype(int)
-
-    display = display.reset_index()  # model becomes a regular column
-    headers = list(display.columns)
-    col_widths = [max(len(h), 8) for h in headers]
-
-    def _sep() -> str:
-        """
-        Generate a separator row for the Markdown table.
-        """
-        return "| " + " | ".join("-" * w for w in col_widths) + " |"
-
-    def _row(values: list) -> str:
-        """
-        Format a single row of values with padding for Markdown.
-        """
-        cells = [str(v).ljust(w) for v, w in zip(values, col_widths)]
-        return "| " + " | ".join(cells) + " |"
-
-    lines = [
-        _row(headers),
-        _sep(),
-        *[_row(list(row)) for _, row in display.iterrows()],
-    ]
-    return "\n".join(lines)
+ 
+    return render_markdown_table(display.reset_index())
 
 
 # Command-line interface
