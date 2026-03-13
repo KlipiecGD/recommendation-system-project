@@ -17,6 +17,7 @@ def render_tab_recommendations(
         title_to_poster (dict): Mapping of movie titles to their poster URLs for rendering.
     """
     st.header("Your Recommendations")
+    st.caption("Based on films you liked in the **Rate Movies** tab.")
 
     if not st.session_state.user_ratings:
         st.info(

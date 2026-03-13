@@ -17,7 +17,7 @@ def render_tab_similar(
         title_to_poster (dict): Mapping of movie titles to their poster URLs for rendering.
     """
     st.header("Find Similar Movies")
-    st.caption("Select any movie to find the most content-similar films.")
+    st.caption("Select any movie to find the most content-similar films to it.")
 
     col_title, col_n = st.columns([3, 1])
 
